@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Remaining Useful Life Predictor</title>
+
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet">
+
+    <style>
+    :root {
+      --bg: #0f172a;           /* slate-900 */
+      --card: #111827;         /* gray-900 */
+      --muted: #9ca3af;        /* gray-400 */
+      --text: #e5e7eb;         /* gray-200 */
+      --accent: #38bdf8;       /* sky-400 */
+      --accent-dark: #0284c7;  /* sky-600 */
+      --border: #1f2933;
+      --success: #22c55e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1e293b 0%, var(--bg) 40%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 26px 28px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    }
+
+    .header {
+      margin-bottom: 18px;
+    }
+
+    .header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.02em;
+    }
+
+    .header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .section {
+      margin-top: 22px;
+    }
+
+    .section h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #c7d2fe;
+      margin: 0 0 12px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .field input {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(56,189,248,0.2);
+    }
+
+    .actions {
+      margin-top: 26px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: #001018;
+      box-shadow: 0 8px 24px rgba(56,189,248,0.35);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.05);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    /* Right column (Result) */
+    .result {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .rul-box {
+      margin-top: auto;
+      background: linear-gradient(180deg, rgba(34,197,94,0.15), rgba(34,197,94,0));
+      border: 1px solid rgba(34,197,94,0.4);
+      border-radius: 18px;
+      padding: 26px;
+      text-align: center;
+    }
+
+    .rul-box h3 {
+      margin: 0 0 8px 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #bbf7d0;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .rul-value {
+      font-size: 3.2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin: 6px 0 0 0;
+    }
+
+    .rul-unit {
+      font-size: 1rem;
+      color: #dcfce7;
+      margin-left: 6px;
+    }
+
+    .placeholder {
+      color: var(--muted);
+      font-size: 0.95rem;
+      text-align: center;
+      margin-top: auto;
+      opacity: 0.7;
+    }
+
+    footer {
+      margin-top: 18px;
+      font-size: 0.75rem;
+      color: #6b7280;
+      text-align: center;
+    }
+  </style>
+  </head>
+  <body>
+
+    <form class="container" method="POST" action="/predict">
+
+      <!-- LEFT: INPUTS -->
+      <div class="card">
+        <div class="header">
+          <h1>RUL Prediction</h1>
+          <p>Enter engine operating conditions and sensor readings.</p>
+        </div>
+
+        <div class="section">
+          <h2>Operating Settings</h2>
+          <div class="grid">
+            <div class="field">
+              <label>Op Setting 1</label>
+              <input type="number" step="any" name="op_setting_1"
+                placeholder="{{ placeholders['op_setting_1'] }}"
+                value="{{ placeholders['op_setting_1'] }}" required />
+            </div>
+            <div class="field">
+              <label>Op Setting 2</label>
+              <input type="number" step="any" name="op_setting_2"
+                placeholder="{{ placeholders['op_setting_2'] }}"
+                value="{{ placeholders['op_setting_2'] }}" required />
+            </div>
+            <div class="field">
+              <label>Op Setting 3</label>
+              <input type="number" step="any" name="op_setting_3"
+                placeholder="{{ placeholders['op_setting_3'] }}"
+                value="{{ placeholders['op_setting_3'] }}" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Sensors</h2>
+          <div class="grid">
+            <!-- Example sensor fields -->
+            <div class="field"><label>Sensor 2</label><input type="number"
+                step="any" name="sensor_2"
+                placeholder="{{ placeholders['sensor_2'] }}"
+                value="{{ placeholders['sensor_2'] }}" required></div>
+            <div class="field"><label>Sensor 3</label><input type="number"
+                step="any" name="sensor_3"
+                placeholder="{{ placeholders['sensor_3'] }}"
+                value="{{ placeholders['sensor_3'] }}" required></div>
+            <div class="field"><label>Sensor 4</label><input type="number"
+                step="any" name="sensor_4"
+                placeholder="{{ placeholders['sensor_4'] }}"
+                value="{{ placeholders['sensor_4'] }}" required></div>
+            <div class="field"><label>Sensor 7</label><input type="number"
+                step="any" name="sensor_7"
+                placeholder="{{ placeholders['sensor_7'] }}"
+                value="{{ placeholders['sensor_7'] }}" required></div>
+            <div class="field"><label>Sensor 9</label><input type="number"
+                step="any" name="sensor_9"
+                placeholder="{{ placeholders['sensor_9'] }}"
+                value="{{ placeholders['sensor_9'] }}" required></div>
+            <div class="field"><label>Sensor 11</label><input type="number"
+                step="any" name="sensor_11"
+                placeholder="{{ placeholders['sensor_11'] }}"
+                value="{{ placeholders['sensor_11'] }}" required></div>
+            <div class="field"><label>Sensor 12</label><input type="number"
+                step="any" name="sensor_12"
+                placeholder="{{ placeholders['sensor_12'] }}"
+                value="{{ placeholders['sensor_12'] }}" required></div>
+            <div class="field"><label>Sensor 14</label><input type="number"
+                step="any" name="sensor_14"
+                placeholder="{{ placeholders['sensor_14'] }}"
+                value="{{ placeholders['sensor_14'] }}" required></div>
+            <div class="field"><label>Sensor 17</label><input type="number"
+                step="any" name="sensor_17"
+                placeholder="{{ placeholders['sensor_17'] }}"
+                value="{{ placeholders['sensor_17'] }}" required></div>
+            <div class="field"><label>Sensor 20</label><input type="number"
+                step="any" name="sensor_20"
+                placeholder="{{ placeholders['sensor_20'] }}"
+                value="{{ placeholders['sensor_20'] }}" required></div>
+            <div class="field"><label>Sensor 21</label><input type="number"
+                step="any" name="sensor_21"
+                placeholder="{{ placeholders['sensor_21'] }}"
+                value="{{ placeholders['sensor_21'] }}" required></div>
+            <!-- Add/remove sensors freely -->
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn btn-primary">Predict RUL</button>
+          <button type="reset" class="btn btn-secondary">Clear</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: RESULT -->
+      <div class="card result">
+        <div class="header">
+          <h1>Prediction Output</h1>
+          <p>Model-estimated remaining useful life.</p>
+        </div>
+
+        <!-- Show this block only when prediction exists -->
+        {% if prediction is defined %}
+        <div class="rul-box">
+          <h3>Remaining Useful Life</h3>
+          <div class="rul-value">
+            {{ prediction }}<span class="rul-unit">cycles</span>
+          </div>
+        </div>
+        {% else %}
+        <div class="placeholder">
+          Submit inputs to see the predicted RUL.
+        </div>
+        {% endif %}
+
+        <footer>
+          LSTM-based prognostics model
+        </footer>
+      </div>
+
+    </form>
+
+  </body>
+</html>
