@@ -5,12 +5,12 @@ import pandas as pd
 from tensorflow.keras.models import load_model
 from sklearn.preprocessing import MinMaxScaler
 import joblib
+import pickle
 
 
 app = Flask(__name__)
 model = joblib.load('rul_lstm.pkl')
 # scaler = joblib.load('minmax_scaler1.pkl')
-import pickle
 with open('pickle.pkl', "rb") as f:
     scaler = pickle.load(f)
 
