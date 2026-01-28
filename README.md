@@ -3,7 +3,7 @@
 # Remaining Useful Life Calculator
 
 ![last-commit](https://img.shields.io/github/last-commit/Gushtasp47/Remaining-Useful-Life-Calculator?style=flat&logo=git&logoColor=white&color=0080ff)
-![repo-top-language](https://img.shields.io/github/languages/top/Gushtasp47/Remaining-Useful-Life-Calculator?style=flat&color=0080ff)
+![python](https://img.shields.io/badge/Python-ML%20%7C%20TensorFlow%20%7C%20Flask-3776AB?style=flat&logo=python&logoColor=white)
 ![repo-language-count](https://img.shields.io/github/languages/count/Gushtasp47/Remaining-Useful-Life-Calculator?style=flat&color=0080ff)
 
 **Built with:**
@@ -26,9 +26,7 @@ An application to estimate the **Remaining Useful Life (RUL)** of equipment or c
 - [Key Features](#key-features)
 - [How It Works](#how-it-works)
 - [Installation](#installation)
-- [Running the App](#running-the-app)
-- [Example Usage](#example-usage)
-- [Credits](#credits)
+- [Authors](#authors)
 
 ---
 
@@ -106,17 +104,20 @@ The system returns a numeric RUL estimate and optionally visualization of degrad
     ```bash
     pip install -r requirements.txt
     ```
-lask, numpy
+    
 4. Run the Flask app(user-interface.py):
    ```bash
    python main.py
    ```
+   
 5. Open your browser:
    http://127.0.0.1:5000/
 
 
-## Author
+## Authors
 
 **Author:** Shehzada Gushtasp Khan Mahad Ajmal
+
 **Course:** Data Mining  
+
 **Institution:** Bahria University
